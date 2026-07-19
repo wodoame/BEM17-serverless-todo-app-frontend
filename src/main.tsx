@@ -3,9 +3,13 @@ import { createRoot } from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
 import "./index.css"
+import "@/lib/amplify"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/lib/auth-context"
+import { ProtectedRoute } from "@/components/protected-route"
 import App from "./App"
 import Home from "./pages/home"
+import SignIn from "./pages/sign-in"
 
 const router = createBrowserRouter([
   {
@@ -13,8 +17,17 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true,
-        element: <Home />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            index: true,
+            element: <Home />,
+          },
+        ],
+      },
+      {
+        path: "sign-in",
+        element: <SignIn />,
       },
     ],
   },
@@ -23,7 +36,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>
 )
