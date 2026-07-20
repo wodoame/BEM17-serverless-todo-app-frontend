@@ -65,7 +65,13 @@ export default function SignIn() {
   }
 
   const inputBase =
-    "h-11 w-full rounded-lg border bg-white px-3 text-sm font-medium text-[#08283B] outline-none transition-colors placeholder:text-gray-400 focus:border-[#08283B] focus:ring-2 focus:ring-[#08283B]/15 dark:bg-[#0b1826] dark:text-[#EAEEF0] dark:focus:border-white/30 dark:focus:ring-white/10"
+    "h-11 w-full rounded-lg border bg-white px-3 text-sm font-medium text-[#08283B] outline-none transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.16,1,0.30,1)] placeholder:text-gray-400 dark:bg-[#0b1826] dark:text-[#EAEEF0]"
+
+  const inputFocusNormal =
+    "border-gray-300 focus:border-[#FF5A00] focus:shadow-[0_0_0_2px_#fff,0_0_0_4px_rgba(255,90,0,.4)] dark:border-white/[0.12] dark:focus:border-[#FF5A00] dark:focus:shadow-[0_0_0_2px_#0f1e2b,0_0_0_4px_rgba(255,90,0,.45)]"
+
+  const inputFocusError =
+    "border-[#E02424] bg-[#FEFAFA] focus:border-[#E02424] focus:shadow-[0_0_0_2px_#fff,0_0_0_4px_rgba(224,36,36,.4)] dark:bg-[#0b1826] dark:focus:shadow-[0_0_0_2px_#0f1e2b,0_0_0_4px_rgba(224,36,36,.45)]"
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-[radial-gradient(circle_at_30%_0%,#F0F1F3,#E4E6E8)] p-6 dark:bg-[radial-gradient(circle_at_30%_0%,#0f2033,#0a1620)]">
@@ -124,12 +130,7 @@ export default function SignIn() {
                 if (emailError) setEmailError(null)
               }}
               aria-invalid={emailError ? true : undefined}
-              className={
-                inputBase +
-                (emailError
-                  ? " border-[#E02424] bg-[#FEFAFA] focus:border-[#E02424] focus:ring-[#E02424]/15 dark:bg-[#0b1826]"
-                  : " border-gray-300 dark:border-white/[0.12]")
-              }
+              className={inputBase + " " + (emailError ? inputFocusError : inputFocusNormal)}
             />
             {emailError && (
               <div className="mt-0.5 flex items-center gap-1.5 text-[12.5px] font-medium text-[#C81E1E] dark:text-[#F98080]">
@@ -155,7 +156,7 @@ export default function SignIn() {
                 minLength={8}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className={inputBase + " border-gray-300 pr-11 dark:border-white/[0.12]"}
+                className={inputBase + " " + inputFocusNormal + " pr-11"}
               />
               <button
                 type="button"

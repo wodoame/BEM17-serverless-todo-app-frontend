@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { toast } from "sonner"
 import {
+  CheckCircle2Icon,
   CheckIcon,
   ClockIcon,
+  InboxIcon,
   Loader2Icon,
   LogOutIcon,
   PlusIcon,
+  ShieldCheckIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react"
@@ -22,6 +25,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 
 const SKELETON_WIDTHS: { title: string; subtitle: string }[] = [
   { title: "w-[70%]", subtitle: "w-[40%]" },
@@ -31,6 +41,33 @@ const SKELETON_WIDTHS: { title: string; subtitle: string }[] = [
 
 type Status = "Pending" | "Completed" | "Expired"
 const STATUSES: Status[] = ["Pending", "Completed", "Expired"]
+
+const EMPTY_STATE: Record<
+  Status,
+  { icon: typeof InboxIcon; mediaClass: string; title: string; description: string }
+> = {
+  Pending: {
+    icon: InboxIcon,
+    mediaClass:
+      "border-[#CDE6FC] bg-[#EFF7FE] text-[#427CAF] dark:border-[#5DAFF6]/25 dark:bg-[#5DAFF6]/15 dark:text-[#7DBFF8]",
+    title: "No pending tasks yet",
+    description: "Add a task and you'll have 5 minutes to complete it before it expires.",
+  },
+  Completed: {
+    icon: CheckCircle2Icon,
+    mediaClass:
+      "border-[#BCF0DA] bg-[#DEF7EC] text-[#057A55] dark:border-[#0E9F6E]/25 dark:bg-[#0E9F6E]/15 dark:text-[#6EE7B7]",
+    title: "No completed tasks yet",
+    description: "Tasks you finish before their deadline will show up here.",
+  },
+  Expired: {
+    icon: ShieldCheckIcon,
+    mediaClass:
+      "border-[#FBD5D5] bg-[#FDE8E8] text-[#C81E1E] dark:border-[#F05252]/25 dark:bg-[#F05252]/15 dark:text-[#F8B4B4]",
+    title: "Nothing has expired",
+    description: "Complete your tasks before the countdown hits zero and this tab stays empty.",
+  },
+}
 
 const BADGE: Record<Status, { wrap: string; dot: string; label: string }> = {
   Pending: {
@@ -135,6 +172,9 @@ export default function Home() {
     return list
   }, [tasks, activeTab])
 
+  const emptyState = EMPTY_STATE[activeTab]
+  const EmptyIcon = emptyState.icon
+
   async function handleCreate(event: FormEvent) {
     event.preventDefault()
     if (!description.trim()) return
@@ -211,9 +251,10 @@ export default function Home() {
         {/* New task */}
         <form
           onSubmit={handleCreate}
-          className="mb-6 flex flex-col gap-2.5 rounded-xl border border-gray-200 bg-white p-2.5 shadow-[0_1px_2px_rgba(0,0,0,.04)] sm:flex-row sm:items-center sm:gap-2.5 dark:border-white/[0.09] dark:bg-[#0f1e2b]"
+          className="mb-6 flex flex-col gap-2.5 rounded-xl border border-gray-200 bg-white p-2.5 shadow-[0_1px_2px_rgba(0,0,0,.04)] transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.16,1,0.30,1)] sm:flex-row sm:items-center sm:gap-2.5 focus-within:border-[#FF5A00] focus-within:shadow-[0_0_0_2px_#FBFBFC,0_0_0_4px_rgba(255,90,0,.4)] dark:border-white/[0.09] dark:bg-[#0f1e2b] dark:focus-within:border-[#FF5A00] dark:focus-within:shadow-[0_0_0_2px_#0a1620,0_0_0_4px_rgba(255,90,0,.45)]"
         >
           <input
+            autoFocus
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Add a task, expires in 5 minutes…"
@@ -287,11 +328,15 @@ export default function Home() {
             ))}
 
           {!isLoading && visible.length === 0 && (
-            <div className="rounded-xl border border-dashed border-gray-200 bg-white/50 px-6 py-12 text-center dark:border-white/[0.1] dark:bg-transparent">
-              <p className="text-sm text-gray-500 dark:text-[#8D9CA5]">
-                No {activeTab.toLowerCase()} tasks{activeTab === "Pending" ? " yet" : ""}.
-              </p>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon" className={emptyState.mediaClass}>
+                  <EmptyIcon />
+                </EmptyMedia>
+                <EmptyTitle>{emptyState.title}</EmptyTitle>
+                <EmptyDescription>{emptyState.description}</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )}
 
           {!isLoading &&
