@@ -35,7 +35,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="light">
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
