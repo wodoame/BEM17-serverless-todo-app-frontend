@@ -12,6 +12,16 @@ import {
 import { useAuth } from "@/lib/use-auth"
 import { tasksApi, type Task } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const SKELETON_WIDTHS: { title: string; subtitle: string }[] = [
   { title: "w-[70%]", subtitle: "w-[40%]" },
@@ -78,6 +88,8 @@ export default function Home() {
   const [isCreating, setIsCreating] = useState(false)
   const [activeTab, setActiveTab] = useState<Status>("Pending")
   const [now, setNow] = useState(() => Date.now())
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const auth = useAuth()
 
   async function loadTasks(silent = false) {
@@ -151,13 +163,18 @@ export default function Home() {
     }
   }
 
-  async function handleDelete(taskId: string) {
+  async function handleConfirmDelete() {
+    if (!taskToDelete) return
+    setIsDeleting(true)
     try {
-      await tasksApi.remove(taskId)
+      await tasksApi.remove(taskToDelete.TaskId)
       await loadTasks(true)
       toast.success("Task deleted")
+      setTaskToDelete(null)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete task")
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -355,7 +372,7 @@ export default function Home() {
                   </span>
 
                   <button
-                    onClick={() => handleDelete(task.TaskId)}
+                    onClick={() => setTaskToDelete(task)}
                     aria-label="Delete task"
                     className="flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-lg border border-transparent text-gray-400 transition-colors hover:border-[#FBD5D5] hover:bg-[#FDE8E8] hover:text-[#C81E1E] dark:text-[#64798a] dark:hover:border-transparent dark:hover:bg-[#F05252]/15 dark:hover:text-[#F8B4B4]"
                   >
@@ -366,6 +383,29 @@ export default function Home() {
             })}
         </div>
       </main>
+
+      <AlertDialog
+        open={taskToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setTaskToDelete(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete task?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{taskToDelete?.Description}&rdquo; will be permanently removed. This can&rsquo;t be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} disabled={isDeleting}>
+              {isDeleting && <Loader2Icon className="h-4 w-4 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
