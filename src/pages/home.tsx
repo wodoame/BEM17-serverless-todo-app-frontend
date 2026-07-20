@@ -3,6 +3,7 @@ import { toast } from "sonner"
 import {
   CheckIcon,
   ClockIcon,
+  Loader2Icon,
   LogOutIcon,
   PlusIcon,
   Trash2Icon,
@@ -166,7 +167,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => auth.signOut()}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-[7px] text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-100 sm:px-3 dark:border-white/[0.12] dark:bg-[#0f1e2b] dark:text-[#C5D0D7] dark:hover:bg-[#17293a]"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-[7px] text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-100 sm:px-3 dark:border-white/[0.12] dark:bg-[#0f1e2b] dark:text-[#C5D0D7] dark:hover:bg-[#17293a]"
           >
             <LogOutIcon className="h-[15px] w-[15px]" />
             <span className="hidden sm:inline">Sign out</span>
@@ -197,10 +198,10 @@ export default function Home() {
             <button
               type="submit"
               disabled={isCreating}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#08283B] px-4 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#072436] disabled:opacity-70 sm:flex-none dark:bg-[#FDFDFD] dark:text-[#08283B] dark:hover:bg-[#E6EAEB]"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-[#08283B] px-4 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-[#072436] disabled:opacity-70 sm:flex-none dark:bg-[#FDFDFD] dark:text-[#08283B] dark:hover:bg-[#E6EAEB]"
             >
-              <PlusIcon className="h-4 w-4" />
-              Add task
+              {isCreating ? <Loader2Icon className="h-4 w-4 animate-spin" /> : <PlusIcon className="h-4 w-4" />}
+              {isCreating ? "Adding…" : "Add task"}
             </button>
           </div>
         </form>
@@ -215,7 +216,7 @@ export default function Home() {
                   key={status}
                   onClick={() => setActiveTab(status)}
                   className={
-                    "flex items-center gap-1.5 rounded-md px-3 py-[7px] text-[13.5px] font-semibold transition-colors sm:px-3.5 " +
+                    "flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-[7px] text-[13.5px] font-semibold transition-colors sm:px-3.5 " +
                     (active
                       ? "bg-white text-[#08283B] shadow-sm dark:bg-[#17293a] dark:text-[#EAEEF0]"
                       : "text-gray-500 hover:text-[#08283B] dark:text-[#8D9CA5] dark:hover:text-[#EAEEF0]")
@@ -281,7 +282,7 @@ export default function Home() {
                     <button
                       onClick={() => handleComplete(task.TaskId)}
                       aria-label="Mark complete"
-                      className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full border-[1.5px] border-[#CBD5D9] transition-colors hover:border-[#0E9F6E] hover:bg-[#F3FAF7] dark:border-white/25 dark:hover:border-[#0E9F6E]"
+                      className="mt-0.5 flex h-6 w-6 flex-none cursor-pointer items-center justify-center rounded-full border-[1.5px] border-[#CBD5D9] transition-colors hover:border-[#0E9F6E] hover:bg-[#F3FAF7] dark:border-white/25 dark:hover:border-[#0E9F6E]"
                     />
                   ) : (
                     <span
@@ -340,7 +341,7 @@ export default function Home() {
                   <button
                     onClick={() => handleDelete(task.TaskId)}
                     aria-label="Delete task"
-                    className="flex h-8 w-8 flex-none items-center justify-center rounded-lg border border-transparent text-gray-400 transition-colors hover:border-[#FBD5D5] hover:bg-[#FDE8E8] hover:text-[#C81E1E] dark:text-[#64798a] dark:hover:border-transparent dark:hover:bg-[#F05252]/15 dark:hover:text-[#F8B4B4]"
+                    className="flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-lg border border-transparent text-gray-400 transition-colors hover:border-[#FBD5D5] hover:bg-[#FDE8E8] hover:text-[#C81E1E] dark:text-[#64798a] dark:hover:border-transparent dark:hover:bg-[#F05252]/15 dark:hover:text-[#F8B4B4]"
                   >
                     <Trash2Icon className="h-4 w-4" />
                   </button>
