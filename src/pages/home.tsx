@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { toast } from "sonner"
 import {
-  CalendarIcon,
   CheckIcon,
   ClockIcon,
   LogOutIcon,
@@ -40,13 +39,6 @@ function initials(email: string | null) {
   return chars.toUpperCase()
 }
 
-function formatDate(value?: string) {
-  if (!value) return null
-  const d = new Date(value)
-  if (Number.isNaN(d.getTime())) return null
-  return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })
-}
-
 function formatRemaining(ms: number) {
   if (ms <= 0) return "expired"
   const total = Math.floor(ms / 1000)
@@ -74,7 +66,6 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState("")
   const [isCreating, setIsCreating] = useState(false)
   const [activeTab, setActiveTab] = useState<Status>("Pending")
   const [now, setNow] = useState(() => Date.now())
@@ -129,9 +120,8 @@ export default function Home() {
 
     setIsCreating(true)
     try {
-      await tasksApi.create({ Description: description.trim(), Date: date || undefined })
+      await tasksApi.create({ Description: description.trim() })
       setDescription("")
-      setDate("")
       await loadTasks(true)
       setActiveTab("Pending")
       toast.success("Task created")
@@ -204,16 +194,6 @@ export default function Home() {
             className="min-w-0 flex-1 bg-transparent px-1.5 py-2 text-[14.5px] font-medium text-[#08283B] outline-none placeholder:text-gray-400 dark:text-[#EAEEF0] dark:placeholder:text-[#64798a]"
           />
           <div className="flex gap-2.5">
-            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-[13.5px] font-medium text-gray-600 transition-colors hover:bg-gray-100 sm:flex-none dark:border-white/[0.12] dark:bg-[#0b1826] dark:text-[#C5D0D7] dark:hover:bg-[#17293a]">
-              <CalendarIcon className="h-[15px] w-[15px]" />
-              <span className="whitespace-nowrap">{date ? formatDate(date) : "Set date"}</span>
-              <input
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                className="sr-only"
-              />
-            </label>
             <button
               type="submit"
               disabled={isCreating}
@@ -285,7 +265,6 @@ export default function Home() {
             visible.map((task) => {
               const remaining = new Date(task.Deadline).getTime() - now
               const low = task.Status === "Pending" && remaining > 0 && remaining < 60000
-              const dateLabel = formatDate(task.Date)
               const badge = BADGE[task.Status]
               return (
                 <div
@@ -329,17 +308,8 @@ export default function Home() {
                       {task.Description}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-gray-500 dark:text-[#8D9CA5]">
-                      {dateLabel && (
-                        <span className="inline-flex items-center gap-1.5">
-                          <CalendarIcon className="h-[13px] w-[13px]" />
-                          {dateLabel}
-                        </span>
-                      )}
                       {task.Status === "Pending" && (
                         <>
-                          {dateLabel && (
-                            <span className="h-[3px] w-[3px] rounded-full bg-gray-300 dark:bg-[#3a5364]" />
-                          )}
                           <span
                             className={
                               "inline-flex items-center gap-1.5 font-mono " +
