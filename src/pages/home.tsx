@@ -7,9 +7,17 @@ import {
   LogOutIcon,
   PlusIcon,
   Trash2Icon,
+  XIcon,
 } from "lucide-react"
 import { useAuth } from "@/lib/use-auth"
 import { tasksApi, type Task } from "@/lib/api"
+import { Skeleton } from "@/components/ui/skeleton"
+
+const SKELETON_WIDTHS: { title: string; subtitle: string }[] = [
+  { title: "w-[70%]", subtitle: "w-[40%]" },
+  { title: "w-[55%]", subtitle: "w-[48%]" },
+  { title: "w-[62%]", subtitle: "w-[35%]" },
+]
 
 type Status = "Pending" | "Completed" | "Expired"
 const STATUSES: Status[] = ["Pending", "Completed", "Expired"]
@@ -247,11 +255,18 @@ export default function Home() {
         {/* List */}
         <div className="flex flex-col gap-2.5">
           {isLoading &&
-            [0, 1, 2].map((i) => (
+            SKELETON_WIDTHS.map((widths, i) => (
               <div
                 key={i}
-                className="h-[74px] animate-pulse rounded-xl border border-gray-200 bg-white dark:border-white/[0.08] dark:bg-[#0f1e2b]"
-              />
+                className="flex items-center gap-3 rounded-xl border border-[#EAECEE] bg-white p-3.5 sm:gap-3.5 dark:border-white/[0.08] dark:bg-[#0f1e2b]"
+              >
+                <Skeleton className="h-6 w-6 flex-none rounded-full" />
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <Skeleton className={`h-3 rounded-md ${widths.title}`} />
+                  <Skeleton className={`h-2.5 rounded-md ${widths.subtitle}`} />
+                </div>
+                <Skeleton className="h-[22px] w-[72px] flex-none rounded-full" />
+              </div>
             ))}
 
           {!isLoading && visible.length === 0 && (
@@ -294,6 +309,7 @@ export default function Home() {
                       }
                     >
                       {task.Status === "Completed" && <CheckIcon className="h-3.5 w-3.5" />}
+                      {task.Status === "Expired" && <XIcon className="h-3.5 w-3.5" />}
                     </span>
                   )}
 
